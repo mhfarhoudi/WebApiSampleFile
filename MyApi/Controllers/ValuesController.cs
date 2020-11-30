@@ -9,29 +9,18 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace MyApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        // GET: api/<ValuesController>
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
         }
 
-        // GET api/<ValuesController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/<ValuesController>
         [HttpPost]
         public void Post([FromBody] string value, IFormFile file)
         {
@@ -47,7 +36,7 @@ namespace MyApi.Controllers
                 var json = Request.Form;
                 var file = json.Files[0];
                 var _products = Request.Form["JsonDetails"];
-               
+
                 var _pro = JsonConvert.DeserializeObject<Products>(_products);
 
                 var folderName = Path.Combine("Resources", "Images");
@@ -78,16 +67,46 @@ namespace MyApi.Controllers
             }
         }
 
-        // PUT api/<ValuesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [Route("MultipleUploud")]
+        [HttpPost, DisableRequestSizeLimit]
+        public IActionResult MultipleUploud()
         {
+            try
+            {
+                var json = Request.Form;
+                var fileOne = json.Files[0];
+                var fileTwo = json.Files[1];
+                var fileThree = json.Files[2];
+                var _products = Request.Form["JsonDetails"];
+
+                IFormFile[] formFiles = new IFormFile[] { fileOne, fileTwo, fileThree };
+
+                var _pro = JsonConvert.DeserializeObject<Products>(_products);
+
+                var folderName = Path.Combine("Resources", "Images");
+                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
+
+                foreach (var item in formFiles)
+                {
+                    var fileName = $"{ContentDispositionHeaderValue.Parse(item.ContentDisposition).FileName.Trim('"')}.jpeg";
+                    var fullPath = Path.Combine(pathToSave, fileName);
+                    var dbPath = Path.Combine(folderName, fileName);
+
+                    using (var stream = new FileStream(fullPath, FileMode.Create))
+                    {
+                        item.CopyTo(stream);
+                    }
+                }
+
+                return Ok();
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex}");
+            }
         }
 
-        // DELETE api/<ValuesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+
     }
 }

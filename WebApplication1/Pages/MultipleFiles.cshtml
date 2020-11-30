@@ -1,0 +1,35 @@
+﻿@page
+@model WebApplication1.Pages.MultipleFilesModel
+
+<div class="container">
+    <form enctype="multipart/form-data" method="post">
+        <dl>
+            <dt>
+                <label asp-for="FileUpload.FormFileOne"></label>
+            </dt>
+            <dd>
+                <input asp-for="FileUpload.FormFileOne" type="file">
+            </dd>
+        </dl>
+        <dl>
+            <dt>
+                <label asp-for="FileUpload.FormFileTwo"></label>
+            </dt>
+            <dd>
+                <input asp-for="FileUpload.FormFileTwo" type="file">
+            </dd>
+        </dl>
+        <dl>
+            <dt>
+                <label asp-for="FileUpload.FormFileThree"></label>
+            </dt>
+            <dd>
+                <input asp-for="FileUpload.FormFileThree" type="file">
+            </dd>
+        </dl>
+        <input asp-page-handler="Upload" class="btn" type="submit" value="Upload">
+    </form>
+</div>
+
+@{
+}
